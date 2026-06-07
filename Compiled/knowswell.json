@@ -3,9 +3,9 @@
   "api_key": "",
   "model": "meta-ai",
   "max_tokens": 4096,
-  "toolbar_x": 1271,
-  "toolbar_y": 364,
-  "system_prompt": "",
+  "toolbar_x": 1141,
+  "toolbar_y": 286,
+  "system_prompt": "You are a helpful assistant.",
   "ghost_mode": true,
   "opacity": 100,
   "prompts": [
