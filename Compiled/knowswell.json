@@ -1,0 +1,17 @@
+{
+  "api_endpoint": "http://127.0.0.1:9006/v1/chat/completions",
+  "api_key": "",
+  "model": "meta-ai",
+  "max_tokens": 4096,
+  "toolbar_x": 1271,
+  "toolbar_y": 364,
+  "system_prompt": "",
+  "ghost_mode": true,
+  "opacity": 100,
+  "prompts": [
+    {
+      "name": "Assistant",
+      "text": "You are a helpful assistant."
+    }
+  ]
+}
