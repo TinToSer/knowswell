@@ -418,11 +418,10 @@ func (a *App) submitAsk() {
 		return
 	}
 	query := a.editText()
-	if strings.TrimSpace(query) == "" {
+	atts := a.Attachments()
+	if strings.TrimSpace(query) == "" && len(atts) == 0 {
 		return
 	}
-
-	atts := a.Attachments()
 	a.ClearAttachments() // auto-clear snip/attachments once query is submitted
 	a.ResetStream()
 	showOverlay(a, "> PROCESSING...")
