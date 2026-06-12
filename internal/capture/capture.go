@@ -97,7 +97,9 @@ func CaptureRegion(x, y, w, h int) (image.Image, error) {
 	}
 	defer procDeleteObject.Call(hBmp)
 
-	procSelectObject.Call(hdcMem, hBmp)
+	oldBmp, _, _ := procSelectObject.Call(hdcMem, hBmp)
+	defer procSelectObject.Call(hdcMem, oldBmp)
+
 	procBitBlt.Call(
 		hdcMem, 0, 0, uintptr(w), uintptr(h),
 		hdcScreen, uintptr(x), uintptr(y),

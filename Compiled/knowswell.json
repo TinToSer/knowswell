@@ -1,10 +1,10 @@
 {
   "api_endpoint": "http://127.0.0.1:9006/v1/chat/completions",
   "api_key": "",
-  "model": "meta-ai",
+  "model": "gemini-web",
   "max_tokens": 4096,
-  "toolbar_x": 1141,
-  "toolbar_y": 286,
+  "toolbar_x": 1229,
+  "toolbar_y": 74,
   "system_prompt": "You are a helpful assistant.",
   "ghost_mode": true,
   "opacity": 100,
