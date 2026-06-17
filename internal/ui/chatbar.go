@@ -434,6 +434,9 @@ func (a *App) submitAsk() {
 
 	hwnd := a.ChatBar
 	client := a.llm
+	if strings.TrimSpace(query) == "" {
+		query = client.SystemPrompt
+	}
 
 	go func() {
 		defer cancel()
