@@ -116,6 +116,12 @@ func toolbarWndProcImpl(hwnd, umsg, wParam, lParam uintptr) (result uintptr) {
 		a.cfg.ToolbarY = a.tbY
 		_ = a.cfg.Save()
 		return 0
+	case wmWindowPosChanging:
+		wp := (*windowPos)(unsafe.Pointer(lParam))
+		if wp.Flags&swpNoZOrder == 0 {
+			wp.HwndInsertAfter = HWND(hwndTopMost)
+		}
+		return 0
 	case wmDestroy:
 		a.cancelLLM()
 		pPostQuitMessage.Call(0)

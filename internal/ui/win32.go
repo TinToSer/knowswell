@@ -221,6 +221,16 @@ type trackMouseEvent struct {
 	DwHoverTime uint32
 }
 
+type windowPos struct {
+	Hwnd            HWND
+	HwndInsertAfter HWND
+	X               int32
+	Y               int32
+	Cx              int32
+	Cy              int32
+	Flags           uint32
+}
+
 type openFilename struct {
 	LStructSize       uint32
 	HwndOwner         HWND
@@ -320,7 +330,8 @@ const (
 	wmNCLButtonDown  = 0x00A1
 	wmMouseLeave     = 0x02A3
 	wmApp         = 0x8000
-	wmSetCursor   = 0x0020
+	wmSetCursor          = 0x0020
+	wmWindowPosChanging  = 0x0046
 
 	wmCtlColorEdit   = 0x0133
 	wmCtlColorStatic = 0x0138
