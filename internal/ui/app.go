@@ -63,7 +63,8 @@ type App struct {
 	tbAnimFrame int
 
 	// Overlay RichEdit.
-	hwRichEdit Win
+	hwRichEdit   Win
+	overlayCopied bool
 }
 
 func (a *App) alphaValue() byte {

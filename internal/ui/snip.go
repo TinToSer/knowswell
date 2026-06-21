@@ -28,6 +28,7 @@ func snipWndProcImpl(hwnd, umsg, wParam, lParam uintptr) (result uintptr) {
 		return 1
 	case wmLButtonDown:
 		a.snipDragging = true
+		pSetCapture.Call(uintptr(hwnd))
 		x, y := loWord(lParam), hiWord(lParam)
 		pt := point{X: x, Y: y}
 		pClientToScreen.Call(uintptr(hwnd), uintptr(unsafe.Pointer(&pt)))

@@ -3,6 +3,7 @@ package ui
 
 import (
 	"image"
+	"syscall"
 	"unsafe"
 )
 
@@ -65,4 +66,43 @@ func copyImageToClipboard(img image.Image) {
 	pSetClipboardData.Call(cfDIB, hMem)
 	pCloseClipboard.Call()
 	// Clipboard now owns hMem; do not GlobalFree it.
+}
+
+// richEditText reads the plain text content of a RichEdit control.
+func richEditText(hwnd HWND) string {
+	if hwnd == 0 {
+		return ""
+	}
+	n, _, _ := pSendMessageW.Call(uintptr(hwnd), wmGetTextLength, 0, 0)
+	if n == 0 {
+		return ""
+	}
+	buf := make([]uint16, n+1)
+	pSendMessageW.Call(uintptr(hwnd), wmGetText, uintptr(n+1),
+		uintptr(unsafe.Pointer(&buf[0])))
+	return syscall.UTF16ToString(buf)
+}
+
+// copyTextToClipboard places text onto the clipboard as CF_UNICODETEXT.
+func copyTextToClipboard(text string) {
+	utf16, err := syscall.UTF16FromString(text)
+	if err != nil {
+		return
+	}
+	size := uintptr(len(utf16) * 2)
+	hMem, _, _ := pGlobalAlloc.Call(gmemMoveable, size)
+	if hMem == 0 {
+		return
+	}
+	ptr, _, _ := pGlobalLock.Call(hMem)
+	if ptr == 0 {
+		return
+	}
+	dst := (*[1 << 28]uint16)(unsafe.Pointer(ptr))[:len(utf16):len(utf16)]
+	copy(dst, utf16)
+	pGlobalUnlock.Call(hMem)
+	pOpenClipboard.Call(0)
+	pEmptyClipboard.Call()
+	pSetClipboardData.Call(cfUnicodeText, hMem)
+	pCloseClipboard.Call()
 }

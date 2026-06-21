@@ -38,14 +38,21 @@ func overlayWndProcImpl(hwnd, umsg, wParam, lParam uintptr) (result uintptr) {
 		var rc rect
 		pGetClientRect.Call(uintptr(hwnd), uintptr(unsafe.Pointer(&rc)))
 		w := int(rc.Right)
-		// Close button → client click; everything else → draggable caption.
-		if x >= w-70 && x <= w-16 && y >= 9 && y <= 33 {
+		// Close and Copy buttons → client click; everything else → draggable caption.
+		if y >= 9 && y <= 33 && ((x >= w-70 && x <= w-16) || (x >= w-136 && x <= w-82)) {
 			return htClient
 		}
 		return htCaption
 	case wmLButtonDown:
 		x, y := loWord(lParam), hiWord(lParam)
 		a.overlayClick(hwnd, int(x), int(y))
+		return 0
+	case wmTimer:
+		if wParam == 997 {
+			pKillTimer.Call(uintptr(hwnd), 997)
+			a.overlayCopied = false
+			invalidate(HWND(hwnd))
+		}
 		return 0
 	case wmSize:
 		if a.hwRichEdit != 0 {
@@ -131,6 +138,17 @@ func (a *App) overlayClick(hwnd uintptr, x, y int) {
 	if x >= w-70 && x <= w-16 && y >= 9 && y <= 33 {
 		pDestroyWindow.Call(uintptr(hwnd))
 		a.Overlay = 0
+		return
+	}
+	if x >= w-136 && x <= w-82 && y >= 9 && y <= 33 {
+		text := richEditText(a.hwRichEdit)
+		if text == "" {
+			text = a.StreamText()
+		}
+		copyTextToClipboard(text)
+		a.overlayCopied = true
+		pSetTimer.Call(uintptr(hwnd), 997, 1000, 0)
+		invalidate(HWND(hwnd))
 	}
 }
 
@@ -152,9 +170,16 @@ func paintOverlay(hwnd uintptr, a *App) {
 	// Header strip (RichEdit sits below this at y=44).
 	drawRoundRect(memDC, 0, 0, w, 44, 2, clrSurface, 0)
 	fillRect(memDC, 0, 22, w, 22, clrSurface)
-	drawText(memDC, ">> KNOWSWELL AI", ovPad, 10, w-100, 24, clrAccent, 12, true)
+	drawText(memDC, ">> KNOWSWELL AI", ovPad, 10, w-150, 24, clrAccent, 12, true)
 	drawRoundRect(memDC, w-70, 9, 54, 24, 2, clrDanger, 0)
 	drawCenteredText(memDC, "[CLOSE]", w-70, 9, 54, 24, rgb(0, 0, 0), 10, true)
+	if a.overlayCopied {
+		drawRoundRect(memDC, w-136, 9, 54, 24, 2, clrAccent, 0)
+		drawCenteredText(memDC, "[COPIED]", w-136, 9, 54, 24, rgb(0, 0, 0), 10, true)
+	} else {
+		drawRoundRect(memDC, w-136, 9, 54, 24, 2, clrSurface2, clrBorder)
+		drawCenteredText(memDC, "[COPY]", w-136, 9, 54, 24, clrText, 10, true)
+	}
 	_ = h
 }
 

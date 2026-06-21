@@ -19,8 +19,9 @@ import (
 // until the first call to .NewProc / .Handle, which keeps startup fast
 // and allows the package to compile cleanly even if DLLs are missing.
 var (
-	user32 = windows.NewLazySystemDLL("user32.dll")
-	gdi32  = windows.NewLazySystemDLL("gdi32.dll")
+	user32  = windows.NewLazySystemDLL("user32.dll")
+	gdi32   = windows.NewLazySystemDLL("gdi32.dll")
+	dwmapi  = windows.NewLazySystemDLL("dwmapi.dll")
 
 	procGetDC            = user32.NewProc("GetDC")
 	procReleaseDC        = user32.NewProc("ReleaseDC")
@@ -33,6 +34,8 @@ var (
 	procDeleteDC               = gdi32.NewProc("DeleteDC")
 	procDeleteObject           = gdi32.NewProc("DeleteObject")
 	procGetDIBits              = gdi32.NewProc("GetDIBits")
+
+	procDwmFlush = dwmapi.NewProc("DwmFlush")
 )
 
 const (
@@ -99,6 +102,11 @@ func CaptureRegion(x, y, w, h int) (image.Image, error) {
 
 	oldBmp, _, _ := procSelectObject.Call(hdcMem, hBmp)
 	defer procSelectObject.Call(hdcMem, oldBmp)
+
+	// Wait for DWM to present the current frame before grabbing pixels.
+	// This prevents a race where a just-destroyed layered window with
+	// WDA_EXCLUDE_FROM_CAPTURE still appears as black in the BitBlt output.
+	procDwmFlush.Call()
 
 	procBitBlt.Call(
 		hdcMem, 0, 0, uintptr(w), uintptr(h),

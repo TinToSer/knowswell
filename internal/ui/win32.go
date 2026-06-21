@@ -400,8 +400,9 @@ const (
 	ofnFileMustExist = 0x00001000
 	ofnExplorer      = 0x00080000
 
-	cfDIB        = 8
-	gmemMoveable = 0x0002
+	cfDIB         = 8
+	cfUnicodeText = 13
+	gmemMoveable  = 0x0002
 
 	// Combobox styles and messages.
 	cbsDropdown    = 0x0002
@@ -420,9 +421,11 @@ const (
 	wmHScroll    = 0x0114
 
 	// RichEdit control messages.
-	esReadOnly      = 0x0800
-	emSetBkgndColor = 0x0443
-	emSetTextEx     = 0x0461 // sets RichEdit content; detects RTF when Codepage=CP_ACP
+	wmGetText        = 0x000D
+	wmGetTextLength  = 0x000E
+	esReadOnly       = 0x0800
+	emSetBkgndColor  = 0x0443
+	emSetTextEx      = 0x0461 // sets RichEdit content; detects RTF when Codepage=CP_ACP
 )
 
 // Custom window messages (start at WM_APP + 1).
